@@ -14,11 +14,11 @@ class AvailableDriversWidget extends StatelessWidget {
     return ListView.builder(
       itemCount: snapshot.data!.docs.length,
       itemBuilder: (context, index) {
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          height: 100,
-          child: snapshot.data!.docs[index]["available"]
-              ? Card(
+        return snapshot.data!.docs[index]["available"]
+            ? Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                height: 100,
+                child: Card(
                   elevation: 10,
                   child: Row(
                     children: [
@@ -136,20 +136,21 @@ class AvailableDriversWidget extends StatelessWidget {
                       ),
                     ],
                   ),
-                )
-              : Container(
-                  child: Card(
-                    elevation: 10,
-                    color: Colors.blueAccent[100],
-                    child: Center(
-                        child: Text(
-                      "No drivers available now please try again later ",
-                      style:
-                          TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                    )),
-                  ),
-                ),
-        );
+                ))
+            : snapshot.data!.docs.length == 0
+                ? Container(
+                    child: Card(
+                      elevation: 10,
+                      color: Colors.blueAccent[100],
+                      child: Center(
+                          child: Text(
+                        "No drivers available now please try again later ",
+                        style: TextStyle(
+                            fontSize: 17, fontWeight: FontWeight.w600),
+                      )),
+                    ),
+                  )
+                : Container();
       },
     );
   }

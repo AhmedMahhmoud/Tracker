@@ -166,7 +166,7 @@ class FirebaseServices with ChangeNotifier {
       String userPassword,
       BuildContext context,
       String phone,
-      int userType) async {
+      int userTypee) async {
     try {
       isLoading = true;
       notifyListeners();
@@ -181,7 +181,7 @@ class FirebaseServices with ChangeNotifier {
           showErrorDiaglog("Register Failed",
               "Something went wrong please try again later", context);
       });
-      if (userType == 0) //user//
+      if (userTypee == 0) //user//
       {
         print("filling user");
         await FirebaseFirestore.instance
@@ -195,12 +195,25 @@ class FirebaseServices with ChangeNotifier {
             })
             .then((value) =>
                 _auth.currentUser!.updateProfile(displayName: username))
+            .then((value) async {
+              var d = await FirebaseFirestore.instance
+                  .collection("users")
+                  .doc(user.user!.uid)
+                  .get();
+              print(d.exists);
+              if (d.exists) {
+                print("exists");
+                userType = "user";
+              } else {
+                userType = "driver";
+              }
+            })
             .then((value) => Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => HomePage(),
                 )));
-      } else if (userType == 1) {
+      } else if (userTypee == 1) {
         print("filling driver");
         Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
@@ -214,16 +227,28 @@ class FirebaseServices with ChangeNotifier {
           "email": userEmail.trim(),
           "phone": phone,
           "status": "online",
-          "available": false,
+          "available": true,
           "latitude": position.latitude,
           "longitude": position.longitude,
         }).then((value) => _auth.currentUser!
-                .updateProfile(displayName: username)
-                .then((value) => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomePage(),
-                    ))));
+                    .updateProfile(displayName: username)
+                    .then((value) async {
+                  var d = await FirebaseFirestore.instance
+                      .collection("users")
+                      .doc(user.user!.uid)
+                      .get();
+                  print(d.exists);
+                  if (d.exists) {
+                    print("exists");
+                    userType = "user";
+                  } else {
+                    userType = "driver";
+                  }
+                }).then((value) => Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(),
+                        ))));
       }
 
       isLoading = false;

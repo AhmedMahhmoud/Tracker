@@ -1,11 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:track_app/Controllers/FirebaseService/Firebase.dart';
-import 'package:track_app/View/SignIn.dart';
+
 import 'package:track_app/Widgets/AvailableDrivers.dart';
 import 'package:track_app/Widgets/Drawer.dart';
 import 'package:track_app/constants.dart';
