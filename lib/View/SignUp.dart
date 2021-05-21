@@ -25,7 +25,7 @@ class _SignUpState extends State<SignUp> {
   String fileName = "";
 
   String phone = "";
- // File? _image;
+  // File? _image;
   var _radioValue = 0;
 
   _handleRadioValueChange(int value) {
@@ -146,7 +146,7 @@ class _SignUpState extends State<SignUp> {
                                             "assets/placeholder.png"),
                                         fit: BoxFit.contain),
                                     border:
-                                        Border.all(color: Color(0xff335AE6)),
+                                    Border.all(color: Color(0xff335AE6)),
                                   ),
                                 ),
                               ),
@@ -251,9 +251,9 @@ class _SignUpState extends State<SignUp> {
                                   uploadPic(context);
 
                                   Provider.of<FirebaseServices>(context,
-                                          listen: false)
+                                      listen: false)
                                       .signUpUser(name, email, password, _image.toString(),
-                                          context, phone, _radioValue);
+                                      context, phone, _radioValue);
                                 }
                               },
                               child: Container(
@@ -261,16 +261,16 @@ class _SignUpState extends State<SignUp> {
                                 height: 45,
                                 child: Center(
                                   child: Provider.of<FirebaseServices>(context)
-                                          .isLoading
+                                      .isLoading
                                       ? CircularProgressIndicator(
-                                          valueColor:
-                                              new AlwaysStoppedAnimation<Color>(
-                                                  Colors.white),
-                                        )
+                                    valueColor:
+                                    new AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  )
                                       : Text(
-                                          "SIGN UP",
-                                          style: TextStyle(color: Colors.white),
-                                        ),
+                                    "SIGN UP",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                                 decoration: BoxDecoration(
                                     gradient: LinearGradient(colors: [
@@ -358,8 +358,8 @@ class _SignUpState extends State<SignUp> {
       keyboardType: label == "Phone Number"
           ? TextInputType.phone
           : label == "Email"
-              ? TextInputType.emailAddress
-              : TextInputType.multiline,
+          ? TextInputType.emailAddress
+          : TextInputType.multiline,
       style: TextStyle(fontSize: 19, height: 1.5),
       decoration: InputDecoration(
         labelText: label,

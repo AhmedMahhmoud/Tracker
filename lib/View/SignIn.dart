@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'package:track_app/View/SignUp.dart';
-
 import '../Controllers/FirebaseService/Firebase.dart';
+import 'SignUp.dart';
 
 class MyHomePage extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();

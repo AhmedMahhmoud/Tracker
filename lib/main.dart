@@ -5,6 +5,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:track_app/View/HomePage.dart';
 import 'package:track_app/View/SignIn.dart';
+
+import 'package:track_app/View/HomePage.dart';
+import 'package:track_app/View/SignIn.dart';
+
 import 'Controllers/FirebaseService/Firebase.dart';
 
 void main() async {
