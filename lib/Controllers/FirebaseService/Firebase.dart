@@ -1,13 +1,22 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:track_app/Model/Driver.dart';
 import 'package:track_app/View/HomePage.dart';
+import 'package:track_app/View/SignIn.dart';
 
 class FirebaseServices with ChangeNotifier {
+  List<Driver> allDrivers = [];
   bool isLoading = false;
+  bool trackingStatus = false;
+  String userType = "";
   final _auth = FirebaseAuth.instance;
   final user = FirebaseAuth.instance.currentUser;
   void showErrorDiaglog(String title, String message, BuildContext context) {
@@ -34,7 +43,7 @@ class FirebaseServices with ChangeNotifier {
     try {
       isLoading = true;
       notifyListeners();
-      await _auth
+      var x = await _auth
           .signInWithEmailAndPassword(email: email, password: password)
           .catchError((e) {
         if (e.toString().contains("The password is invalid"))
@@ -43,11 +52,112 @@ class FirebaseServices with ChangeNotifier {
             "There is no user record corresponding to this identifier"))
           showErrorDiaglog("Sign in Failed", "Invalid email", context);
       });
+      print(x.user!.uid);
+
+      var d = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(x.user!.uid)
+          .get();
+      print(d.exists);
+      if (d.exists) {
+        print("exists");
+        userType = "user";
+      } else {
+        userType = "driver";
+      }
+
       isLoading = false;
       notifyListeners();
+      await Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ));
     } catch (e) {
       print(e);
     }
+  }
+
+  removeAssignedDrivers(String driverID) {
+    try {
+      print("deleting driver now");
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection("mydrivers")
+          .doc(driverID)
+          .delete();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  startTracking() async {
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    trackingStatus = !trackingStatus;
+    print(trackingStatus);
+    notifyListeners();
+
+    Timer.periodic(Duration(seconds: 30), (timer) {
+      print(timer.isActive);
+      if (!trackingStatus) {
+        timer.cancel();
+      }
+      FirebaseFirestore.instance.collection("drivers").doc(user!.uid).update(
+          {"latitude": position.latitude, "longitude": position.longitude});
+    });
+  }
+
+  signOut(BuildContext context) async {
+    await FirebaseAuth.instance
+        .signOut()
+        .then((value) => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MyHomePage(),
+            )));
+  }
+
+  assignDriver(String driverID) {
+    try {
+      print(
+          "assigning driver now .. ${FirebaseAuth.instance.currentUser!.uid}.");
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection("mydrivers")
+          .doc(driverID)
+          .set({"driverId": driverID});
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  updateDriverStatus(
+      String driverID, bool status, BuildContext context, bool undo) {
+    FirebaseFirestore.instance
+        .collection("drivers")
+        .doc(driverID)
+        .update({"available": status})
+        .then((value) => undo ? print("undo") : Navigator.pop(context))
+        .then((value) {
+          if (!undo) {
+            assignDriver(driverID);
+          } else if (undo) {
+            removeAssignedDrivers(driverID);
+          }
+        });
+  }
+
+  Stream<QuerySnapshot> getDrivers() {
+    try {
+      return FirebaseFirestore.instance.collection("drivers").snapshots();
+    } catch (e) {
+      print(e);
+    }
+    throw (e);
   }
 
   Future<void> signUpUser(
@@ -104,6 +214,7 @@ class FirebaseServices with ChangeNotifier {
           "email": userEmail.trim(),
           "phone": phone,
           "status": "online",
+          "available": false,
           "latitude": position.latitude,
           "longitude": position.longitude,
         }).then((value) => _auth.currentUser!
