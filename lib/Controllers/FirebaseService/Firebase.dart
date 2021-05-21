@@ -3,10 +3,10 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:track_app/Model/Driver.dart';
 import 'package:track_app/View/HomePage.dart';
@@ -26,6 +26,7 @@ class FirebaseServices with ChangeNotifier {
               title: Text(title),
               content: Text(message),
               actions: [
+                // ignore: deprecated_member_use
                 FlatButton(
                   child: Text('Okay'),
                   onPressed: () {
@@ -164,6 +165,7 @@ class FirebaseServices with ChangeNotifier {
       String username,
       String userEmail,
       String userPassword,
+      String userImage,
       BuildContext context,
       String phone,
       int userTypee) async {
@@ -191,6 +193,7 @@ class FirebaseServices with ChangeNotifier {
               "username": username.trim(),
               "email": userEmail.trim(),
               "phone": phone,
+              "userImage": userImage,
               "status": "online",
             })
             .then((value) =>
